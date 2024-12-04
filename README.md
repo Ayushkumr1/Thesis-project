@@ -1,4 +1,4 @@
-# Thesis-project
+# Analyzing the Impact of Deep Learning and Data Augmentation on Medical Image Classification
 
 
 This research investigates the role of deep learning techniques and data augmentation in improving the performance of models for medical image classification. The study focuses on identifying pneumonia in pediatric patients using frontal chest X-ray images.
