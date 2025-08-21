@@ -1,29 +1,119 @@
-# Analyzing the Impact of Deep Learning and Data Augmentation on Medical Image Classification
+### ChestXRay-Pneumonia-Classification
+
+Detect pneumonia from chest X-ray images using deep learning with TensorFlow/Keras. This repository contains multiple experiment notebooks exploring baseline CNNs and transfer learning architectures (ResNet50, EfficientNetB0, VGG16, InceptionV3, DenseNet121) with data augmentation and hyperparameter variations (batch sizes 4–32, fixed target size 180×180, binary classification).
+
+## Key Features
+- **Binary classification**: Pneumonia vs. Normal from chest X-rays
+- **Transfer learning**: ResNet50, EfficientNetB0, VGG16, InceptionV3, DenseNet121
+- **Data augmentation**: Rotation, flips, zoom, and shifts via `ImageDataGenerator`
+- **Reproducible experiments**: Multiple phase notebooks varying batch size and steps-per-epoch
+- **Metrics**: Accuracy, Precision, Recall tracked during training
+
+## Dataset
+Chest X-Ray dataset organized in directory structure for training/validation/test. See dataset link in `Dataset Link.txt`.
+
+Expected structure:
+```
+data/
+  train/
+    NORMAL/
+    PNEUMONIA/
+  val/
+    NORMAL/
+    PNEUMONIA/
+  test/
+    NORMAL/
+    PNEUMONIA/
+```
+Images are resized to `180x180`, `class_mode='binary'`.
+
+## Environment Setup
+Create a Python environment (Anaconda recommended) with TensorFlow/Keras and common imaging utilities.
+
+### Dependencies
+- Python 3.9+
+- TensorFlow 2.x (tested with TF 2.x per notebook logs)
+- Keras (bundled with TF 2.x)
+- NumPy, Pandas, Matplotlib, Seaborn
+- scikit-learn (metrics/utilities)
+- Jupyter Notebook
+
+### Quick Start (Conda)
+```bash
+conda create -n chestxray python=3.9 -y
+conda activate chestxray
+pip install tensorflow==2.12.*
+pip install numpy pandas matplotlib seaborn scikit-learn jupyter
+```
+
+If using NVIDIA GPU, install CUDA/cuDNN versions compatible with your TensorFlow build and then `pip install tensorflow-gpu==2.12.*` (or the TF version matching your CUDA).
+
+## Project Layout
+```
+Code(x21208590)/Code/
+  phase1-(batch 4).ipynb
+  phase1-(batch 8 ).ipynb
+  phase1-(batch 16).ipynb
+  phase1-(batch 4 steps 100).ipynb
+  phase1-(batch 8 steps 100 ).ipynb
+  phase1-(batch 16 steps 100).ipynb
+  phase1(batch= 32).ipynb
+  phase2-(batch 4 steps 100 DA).ipynb
+  phase2-(batch 8  DA).ipynb
+  phase2-(batch 8 steps 100 DA).ipynb
+  phase2-(batch 8 steps 100 DA inc).ipynb
+  phase2(batch 4 DA).ipynb
+  Dataset Link.txt
+```
+
+## Usage
+1) Download the dataset using the link in `Dataset Link.txt`, and arrange it into `data/train`, `data/val`, and `data/test` folders as shown above.
+
+2) Open any notebook in Jupyter:
+```bash
+jupyter notebook
+```
+
+3) Update the following variables in the first cells as needed:
+- `train_dir`, `val_dir`, `test_dir` → paths to your dataset folders
+- `batch_size` → e.g., 4, 8, 16, or 32
+- `target_size=(180, 180)` → keep consistent with model input
+
+4) Run all cells to train and evaluate. Models compile with Adam optimizer and track Accuracy, Precision, and Recall.
+
+### Minimal Example (generator setup excerpt)
+```python
+from keras.preprocessing.image import ImageDataGenerator
+
+image_generator = ImageDataGenerator(rotation_range=20,
+                                     width_shift_range=0.1,
+                                     height_shift_range=0.1,
+                                     zoom_range=0.2,
+                                     horizontal_flip=True,
+                                     rescale=1./255)
+
+train = image_generator.flow_from_directory(train_dir,
+                                            target_size=(180, 180),
+                                            batch_size=8,
+                                            class_mode='binary')
+```
+
+## Results (example)
+- Batch sizes evaluated: 4, 8, 16, 32
+- Transfer models compared: ResNet50, EfficientNetB0, VGG16, InceptionV3, DenseNet121
+- Metrics observed: Accuracy, Precision, Recall (see notebook outputs for exact numbers)
+
+## Reproducibility Notes
+- If you encounter "input ran out of data" warnings, adjust `steps_per_epoch` to match dataset size or use `.repeat()` with tf.data pipelines.
+- For GPU errors in DenseNet/Conv2D layers, confirm compatible CUDA/cuDNN and TF versions.
+
+## Contribution Guidelines
+1. Fork the repository and create a feature branch: `git checkout -b feature/your-feature`
+2. Run notebooks end-to-end to ensure changes don’t break training
+3. Use clear commit messages and include before/after metrics or plots
+4. Open a pull request describing your changes, motivation, and results
+
+## License
+This project is for academic/research use. If you plan to use it commercially, please open an issue to discuss licensing.
 
 
-This research investigates the role of deep learning techniques and data augmentation in improving the performance of models for medical image classification. The study focuses on identifying pneumonia in pediatric patients using frontal chest X-ray images.
-
-Objectives
-The primary goal is to evaluate how hyperparameter tuning and data augmentation affect the performance of pre-trained Convolutional Neural Network (CNN) models for medical image classification.
-
-Dataset
-The dataset comprises 5,863 chest X-ray images, categorized into two classes: Normal and Pneumonia. Images were sourced from pediatric patients aged 1-5 years and divided into training, testing, and validation sets.
-
-Methodology
-Models: Five pre-trained CNN architectures were used:
-ResNet50
-EfficientNetB0
-VGG16
-InceptionV3
-DenseNet121
-Phases:
-Phase 1: Models were trained and tested without data augmentation.
-Phase 2: Data augmentation techniques (e.g., random rotation, zoom, and normalization) were applied to assess their impact on performance.
-Evaluation Metrics: Accuracy, Precision, Recall, Dice Score, and Binary Cross-Entropy Loss were used to measure performance.
-Findings
-Data augmentation generally enhanced performance by reducing cross-entropy loss and increasing overall accuracy.
-VGG16 demonstrated robust performance, particularly in recall, when trained on smaller batch sizes (4 and 8).
-Computational limitations caused training errors for larger batch sizes due to insufficient GPU memory.
-The dataset's bias (74% pneumonia cases) impacted model generalization, emphasizing the need for diverse data.
-Conclusion
-The study highlights the importance of data augmentation and hyperparameter tuning in medical image classification. While data augmentation significantly improved some metrics, it occasionally reduced precision and recall. Future work aims to explore advanced augmentation and optimization techniques to develop more robust and reliable models.
